@@ -40,19 +40,19 @@ export default class Game extends React.Component {
     }
 
     setDirection = newDirection => {
-        if (this.state.blocked || this.direction === newDirection) return false
+        if (this.direction === newDirection) return
         switch (newDirection) {
             case this.directions.left:
-                if (this.direction === this.directions.right) return false
+                if (this.direction === this.directions.right) return
                 break
             case this.directions.up:
-                if (this.direction === this.directions.down) return false
+                if (this.direction === this.directions.down) return
                 break
             case this.directions.right:
-                if (this.direction === this.directions.left) return false
+                if (this.direction === this.directions.left) return
                 break
             case this.directions.down:
-                if (this.direction === this.directions.up) return false
+                if (this.direction === this.directions.up) return
                 break
         }
         this.direction = newDirection
@@ -61,6 +61,12 @@ export default class Game extends React.Component {
 
     onKeyPress = event => {
         event.preventDefault()
+        if (this.state.blocked) return
+
+        // Start game
+        if (!this.state.running) return this.init()
+
+        // Change snake direction
         if (event.keyCode === 37 || event.keyCode === 38 || event.keyCode === 39 || event.keyCode === 40) {
             this.setDirection(parseInt(event.keyCode - 37))
         }
@@ -144,19 +150,21 @@ export default class Game extends React.Component {
         context.fill()
         context.closePath()
 
-        // Unblock keys
-        this.setState({ blocked: false })
-
         // Check rules and continue
-        if (this.checkRules()) return setTimeout(this.run, 200)
+        if (this.checkRules()) {
+            this.setState({ blocked: false })
+            return setTimeout(this.run, 200)
+        }
 
+        // Die
         this.audioPlayer.current.play()
-        this.setState({ running: false, lost: true })
+        this.setState({ running: false, lost: true, blocked: true })
+        setTimeout(() => this.setState({ blocked: false }), 1000)
     }
 
     init = async () => {
         this.setState({ lost: false, running: true, score: 0 })
-        this.snake = [[1, 1]]
+        this.snake = [[1, 2]]
         this.direction = this.directions.right
         this.respawnApple([2, 1])
         this.run()
