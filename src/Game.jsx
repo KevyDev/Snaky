@@ -180,7 +180,7 @@ export default class Game extends React.Component {
             <main className="game-container">
                 <audio src="Game Over.mp3" ref={this.audioPlayer} hidden></audio>
                 {!this.state.running &&
-                    <div className="message-container" onClick={this.init}>
+                    <div className="message-container" onClick={() => !this.state.blocked && this.init()}>
                         {this.state.lost ?
                             <>
                                 <h1 className="lost">Your snake has died :(</h1>
