@@ -7,7 +7,8 @@ export default class Game extends React.Component {
         super(props)
         this.mobileWidth = 660
         this.canvas = createRef()
-        this.audioPlayer = createRef()
+        this.gameOverSound = createRef()
+        this.woopSound = createRef()
         this.cellSize = 30
         this.cellsX = 0
         this.cellsY = 0
@@ -119,6 +120,7 @@ export default class Game extends React.Component {
                         break
                 }
                 if (this.canEat()) {
+                    this.woopSound.current.play()
                     this.respawnApple(lastCoords)
                     this.snake.push([...lastCoords])
                     this.setState({ score: this.state.score + 1 })
@@ -157,7 +159,7 @@ export default class Game extends React.Component {
         }
 
         // Die
-        this.audioPlayer.current.play()
+        this.gameOverSound.current.play()
         this.setState({ running: false, lost: true, blocked: true })
         setTimeout(() => this.setState({ blocked: false }), 1000)
     }
@@ -178,7 +180,8 @@ export default class Game extends React.Component {
     render() {
         return (
             <main className="game-container">
-                <audio src="Game Over.mp3" ref={this.audioPlayer} hidden></audio>
+                <audio src="Game Over.mp3" type="audio/mp3" ref={this.gameOverSound} hidden></audio>
+                <audio src="Woop.mp3" type="audio/mp3" ref={this.woopSound} hidden></audio>
                 {!this.state.running &&
                     <div className="message-container" onClick={() => !this.state.blocked && this.init()}>
                         {this.state.lost ?
